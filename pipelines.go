@@ -3,7 +3,6 @@ package bitbucket
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/url"
 )
@@ -129,7 +128,7 @@ type BitbucketTrigerPipelineRequestBody struct {
 	} `json:"target"`
 }
 
-func (p *Pipelines) TriggerPipeline(po *PipelinesOptions, body *BitbucketTrigerPipelineRequestBody) (string, error) {
+func (p *Pipelines) TriggerPipeline(po *PipelinesOptions, body *BitbucketTrigerPipelineRequestBody) (interface{}, error) {
 	urlStr := p.c.requestUrl("/repositories/%s/%s/pipelines/", po.Owner, po.RepoSlug)
 
 	b, err := json.Marshal(body)
@@ -138,17 +137,10 @@ func (p *Pipelines) TriggerPipeline(po *PipelinesOptions, body *BitbucketTrigerP
 	}
 	data := string(b)
 
-	p.c.execute("POST", urlStr, data)
-	responseBody, err := p.c.executeRaw("GET", urlStr, "")
+	responseBody, err := p.c.execute("POST", urlStr, data)
 	if err != nil {
 		return "failed to trigger bitbucket pipeline", err
 	}
-	defer responseBody.Close()
 
-	rawBody, err := io.ReadAll(responseBody)
-	if err != nil {
-		return "", err
-	}
-
-	return string(rawBody), nil
+	return responseBody, nil
 }
