@@ -1,7 +1,9 @@
 package bitbucket
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/url"
 )
@@ -107,6 +109,43 @@ func (p *Pipelines) GetLog(po *PipelinesOptions) (string, error) {
 	defer responseBody.Close()
 
 	rawBody, err := ioutil.ReadAll(responseBody)
+	if err != nil {
+		return "", err
+	}
+
+	return string(rawBody), nil
+}
+
+type BitbucketTrigerPipelineRequestBody struct {
+	Target struct {
+		RefType  string `json:"ref_type"`
+		Type     string `json:"type"`
+		RefName  string `json:"ref_name"`
+		Selector struct {
+			Type    string `json:"type"`
+			Pattern string `json:"pattern"`
+		} `json:"selector"`
+		Variables string `json:"variables"`
+	} `json:"target"`
+}
+
+func (p *Pipelines) TriggerPipeline(po *PipelinesOptions, body *BitbucketTrigerPipelineRequestBody) (string, error) {
+	urlStr := p.c.requestUrl("/repositories/%s/%s/pipelines/", po.Owner, po.RepoSlug)
+
+	b, err := json.Marshal(body)
+	if err != nil {
+		return "failed to parse body", err
+	}
+	data := string(b)
+
+	p.c.execute("POST", urlStr, data)
+	responseBody, err := p.c.executeRaw("GET", urlStr, "")
+	if err != nil {
+		return "failed to trigger bitbucket pipeline", err
+	}
+	defer responseBody.Close()
+
+	rawBody, err := io.ReadAll(responseBody)
 	if err != nil {
 		return "", err
 	}
