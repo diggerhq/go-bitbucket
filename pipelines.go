@@ -124,8 +124,8 @@ type BitbucketTrigerPipelineRequestBody struct {
 			Type    string `json:"type"`
 			Pattern string `json:"pattern"`
 		} `json:"selector"`
-		Variables string `json:"variables"`
 	} `json:"target"`
+	Variables string `json:"variables"`
 }
 
 func (p *Pipelines) TriggerPipeline(po *PipelinesOptions, body *BitbucketTrigerPipelineRequestBody) (interface{}, error) {
