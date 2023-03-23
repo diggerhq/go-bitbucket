@@ -3,7 +3,7 @@ package bitbucket
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/url"
 )
 
@@ -107,7 +107,7 @@ func (p *Pipelines) GetLog(po *PipelinesOptions) (string, error) {
 	}
 	defer responseBody.Close()
 
-	rawBody, err := ioutil.ReadAll(responseBody)
+	rawBody, err := io.ReadAll(responseBody)
 	if err != nil {
 		return "", err
 	}
@@ -125,7 +125,11 @@ type BitbucketTrigerPipelineRequestBody struct {
 			Pattern string `json:"pattern"`
 		} `json:"selector"`
 	} `json:"target"`
-	Variables string `json:"variables"`
+	Variables []struct {
+		Key     string `json:"key"`
+		Value   string `json:"value"`
+		Secured bool   `json:"secured,omitempty"`
+	} `json:"variables"`
 }
 
 func (p *Pipelines) TriggerPipeline(po *PipelinesOptions, body *BitbucketTrigerPipelineRequestBody) (interface{}, error) {
