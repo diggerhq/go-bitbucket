@@ -115,24 +115,7 @@ func (p *Pipelines) GetLog(po *PipelinesOptions) (string, error) {
 	return string(rawBody), nil
 }
 
-type BitbucketTrigerPipelineRequestBody struct {
-	Target struct {
-		RefType  string `json:"ref_type"`
-		Type     string `json:"type"`
-		RefName  string `json:"ref_name"`
-		Selector struct {
-			Type    string `json:"type"`
-			Pattern string `json:"pattern"`
-		} `json:"selector"`
-	} `json:"target"`
-	Variables []struct {
-		Key     string `json:"key"`
-		Value   string `json:"value"`
-		Secured bool   `json:"secured,omitempty"`
-	} `json:"variables"`
-}
-
-func (p *Pipelines) TriggerPipeline(po *PipelinesOptions, body *BitbucketTrigerPipelineRequestBody) (interface{}, error) {
+func (p *Pipelines) TriggerPipeline(po *PipelinesOptions, body *TriggerPipelineRequestBody) (interface{}, error) {
 	urlStr := p.c.requestUrl("/repositories/%s/%s/pipelines/", po.Owner, po.RepoSlug)
 
 	b, err := json.Marshal(body)

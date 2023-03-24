@@ -552,3 +552,20 @@ type DeployKeyOptions struct {
 	Label    string `json:"label"`
 	Key      string `json:"key"`
 }
+
+type TriggerPipelineRequestBody struct {
+	Target struct {
+		RefType  string `json:"ref_type"`
+		Type     string `json:"type"`
+		RefName  string `json:"ref_name"`
+		Selector struct {
+			Type    string `json:"type"`
+			Pattern string `json:"pattern"`
+		} `json:"selector"`
+	} `json:"target"`
+	Variables []struct {
+		Key     string `json:"key"`
+		Value   string `json:"value"`
+		Secured bool   `json:"secured,omitempty"`
+	} `json:"variables"`
+}
